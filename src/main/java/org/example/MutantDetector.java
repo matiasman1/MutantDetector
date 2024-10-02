@@ -1,35 +1,40 @@
 package org.example;
 
 public class MutantDetector {
-    // Tamaño mínimo de la secuencia para considerar una mutación
     private static final int SEQUENCE_LENGTH = 4;
-    private int countstep=0;
+    private String[] dna;
+    private char[][] dnaMatrix;
+    private int N;
+    private int countstep;
+    MatrizPrint mp = new MatrizPrint(dnaMatrix);
 
-    public boolean isMutant(String[] dna) {
-        int n = dna.length;
-        int countSequences = 0;
+    // Constructor initializes the dna, dnaMatrix, and N
+    public MutantDetector(String[] dna) {
+        this.dna = dna;
+        this.N = dna.length;
 
-        // Convertimos el arreglo de Strings en una matriz de caracteres
-        char[][] dnaMatrix = new char[n][n];
-        for (int i = 0; i < n; i++) {
+        // Convert dna Strings to a character matrix
+        this.dnaMatrix = new char[N][N];
+        for (int i = 0; i < N; i++) {
             dnaMatrix[i] = dna[i].toCharArray();
         }
+    }
 
-        MatrizPrint mp = new MatrizPrint(dnaMatrix);
-
+    public boolean isMutant() {
+        int countSequences = 0;
         System.out.println(dnaMatrix.length);
 
         // Recorremos toda la matriz
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                int[] inicio={i,j};
                 // Verificamos si es posible encontrar secuencias horizontales, verticales o diagonales
                 if (i==0){
-                    if (checkVertical(dnaMatrix,0,j)){
-                        countSequences++;
-                        if (countSequences > 1) {
-                            System.out.println("countstep="+countstep);
-                            return true;  // Más de una secuencia encontrada
-                        }
+                    int[] direccion={1,0};
+                    countSequences+=recorrer(inicio,direccion);
+                    if (countSequences > 1) {
+                        System.out.println("countstep="+countstep);
+                        return true;  // Más de una secuencia encontrada
                     }
                 }
                 if (j==0){
@@ -65,87 +70,35 @@ public class MutantDetector {
         return false;  // No se encontraron suficientes secuencias
     }
 
-    // Verifica secuencias horizontales
-    private boolean checkHorizontal(char[][] dna, int row, int col) {
-        if (col + SEQUENCE_LENGTH > dna.length) return false;  // No hay suficiente espacio
-        char pattern = dna[row][col];
-        int counter=0;
-        for (int i = 1; i < dna.length-1; i++) {
-            countstep++;
-            char current=dna[row][col+i];
-            if (current == pattern) {
-                counter++;
-            }else{
-                counter=0;
-            }
-            if (counter>=4){
-                return true;
-            }
-            pattern=current;
-        }
-        return false;
-    }
+    public int recorrer(int[] inicio, int[] direccion) {
+        char pattern = '\0';  // Initialize with a null character
+        int c = 0;
+        int found = 0;
+        int[] coordinate = {inicio[0], inicio[1]};  // Copy of the starting coordinate
 
-    // Verifica secuencias verticales
-    private boolean checkVertical(char[][] dna, int row, int col) {
-        if (row + SEQUENCE_LENGTH > dna.length) return false;  // No hay suficiente espacio
-        char pattern = dna[row][col];
-        int counter=0;
-        for (int i = 1; i < dna.length-1; i++) {
+        // Traverse while the coordinates are within bounds
+        while (coordinate[0] < N && coordinate[1] < N) {
+            char currentChar = dnaMatrix[coordinate[0]][coordinate[1]];
             countstep++;
-            char current=dna[row+i][col];
-            if (current == pattern) {
-                counter++;
-            }else{
-                counter=0;
+            // Check if the current character matches the pattern
+            if (currentChar == pattern) {
+                c++;  // Increment the match count
+            } else {
+                pattern = currentChar;  // Update pattern to the current character
+                c = 1;  // Reset the match count
             }
-            if (counter>=4){
-                return true;
-            }
-            pattern=current;
-        }
-        return false;
-    }
 
-    // Verifica secuencias diagonales de izquierda a derecha
-    private boolean checkDiagonalRight(char[][] dna, int row, int col) {
-        if (row + SEQUENCE_LENGTH > dna.length || col + SEQUENCE_LENGTH > dna.length) return false;  // No hay suficiente espacio
-        char pattern = dna[row][col];
-        int counter=0;
-        for (int i = 0; i < dna.length-1; i++) {
-            countstep++;
-            char current=dna[row+i][col+i];
-            if (current == pattern) {
-                counter++;
-            }else{
-                counter=0;
+            // If a sequence of SEQUENCE_LENGTH is found
+            if (c == SEQUENCE_LENGTH) {
+                found++;  // Increment found sequences
+                c = 0;    // Reset count for new sequences
             }
-            if (counter >=4){
-                return true;
-            }
-            pattern=current;
-        }
-        return false;
-    }
 
-    // Verifica secuencias diagonales de derecha a izquierda
-    private boolean checkDiagonalLeft(char[][] dna, int row, int col) {
-        if (row + SEQUENCE_LENGTH > dna.length || col - SEQUENCE_LENGTH + 1 < 0) return false;  // No hay suficiente espacio
-        char pattern = dna[row][col];
-        int counter=0;
-        for (int i = 1; i < dna.length-1; i++) {
-            countstep++;
-            char current=dna[row+i][col-i];
-            if (current == pattern) {
-                counter++;
-            }else{
-                counter=0;
-            }
-            if (counter>=4){
-                return true;
-            }
-            pattern=current;
+            // Update the coordinates based on the direction
+            coordinate[0] += direccion[0];
+            coordinate[1] += direccion[1];
         }
-        return false;
+
+        return found;  // Return the number of sequences found
     }
 }
