@@ -20,56 +20,6 @@ public class MutantDetector {
         }
     }
 
-    public boolean isMutant() {
-        int countSequences = 0;
-        System.out.println(dnaMatrix.length);
-
-        // Recorremos toda la matriz
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                int[] inicio={i,j};
-                // Verificamos si es posible encontrar secuencias horizontales, verticales o diagonales
-                if (i==0){
-                    int[] direccion={1,0};
-                    countSequences+=recorrer(inicio,direccion);
-                    if (countSequences > 1) {
-                        System.out.println("countstep="+countstep);
-                        return true;  // Más de una secuencia encontrada
-                    }
-                }
-                if (j==0){
-                    if (checkVertical(dnaMatrix,i,0)){
-                        countSequences++;
-                        if (countSequences > 1) {
-                            System.out.println("countstep="+countstep);
-                            return true;  // Más de una secuencia encontrada
-                        }
-                    }
-                }
-                if (dnaMatrix.length-SEQUENCE_LENGTH<=i+j){
-                    if(checkDiagonalRight(dnaMatrix,i,0)){
-                        countSequences++;
-                        if (countSequences > 1) {
-                            System.out.println("countstep="+countstep);
-                            return true;  // Más de una secuencia encontrada
-                        }
-                    }
-                }
-                if (dnaMatrix.length-SEQUENCE_LENGTH<=i-j+dnaMatrix.length-1) {
-                    if (checkDiagonalLeft(dnaMatrix, i, j)) {
-                        countSequences++;
-                        if (countSequences > 1) {
-                            System.out.println("countstep=" + countstep);
-                            return true;  // Más de una secuencia encontrada
-                        }
-                    }
-                }
-            }
-        }
-        System.out.println("countstep="+countstep);
-        return false;  // No se encontraron suficientes secuencias
-    }
-
     public int recorrer(int[] inicio, int[] direccion) {
         char pattern = '\0';  // Initialize with a null character
         int c = 0;
@@ -100,5 +50,39 @@ public class MutantDetector {
         }
 
         return found;  // Return the number of sequences found
+    }
+
+    public boolean isMutant() {
+        int countSequences = 0;
+        System.out.println(dnaMatrix.length);
+
+        // Recorremos toda la matriz
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                int[] inicio = {i, j};
+                // Verificamos si es posible encontrar secuencias horizontales, verticales o diagonales
+                if (i == 0) {
+                    int[] direccion = {1, 0};
+                    countSequences += recorrer(inicio, direccion);
+                    if (countSequences > 1) {
+                        System.out.println("countstep=" + countstep);
+                        return true;  // Más de una secuencia encontrada
+                    }
+                }
+                if (j == 0) {
+
+                    if (dnaMatrix.length - SEQUENCE_LENGTH <= i + j) {
+
+                        if (dnaMatrix.length - SEQUENCE_LENGTH <= i - j + dnaMatrix.length - 1) {
+
+                        }
+                    }
+                }
+                System.out.println("countstep=" + countstep);
+                return false;  // No se encontraron suficientes secuencias
+            }
+
+        }
+        return false;
     }
 }
