@@ -1,12 +1,15 @@
 package org.example;
 
+import static java.lang.Boolean.*;
+
 public class MutantDetector {
     private static final int SEQUENCE_LENGTH = 4;
     private String[] dna;
     private char[][] dnaMatrix;
     private int N;
     private int countstep;
-    MatrizPrint mp = new MatrizPrint(dnaMatrix);
+    private MatrizPrint mp;
+    private int[][] geneHighlight; // Array to store the gene sequence coordinates
 
     // Constructor initializes the dna, dnaMatrix, and N
     public MutantDetector(String[] dna) {
@@ -18,6 +21,31 @@ public class MutantDetector {
         for (int i = 0; i < N; i++) {
             dnaMatrix[i] = dna[i].toCharArray();
         }
+
+        // Initialize MatrizPrint with the matrix
+        this.mp = new MatrizPrint(dnaMatrix);
+
+        System.out.println("Matriz sin resaltado:");
+        mp.print();
+
+        // Initialize the geneHighlight array (4 coordinates max at a time)
+        this.geneHighlight = new int[SEQUENCE_LENGTH][2];
+    }
+
+    public int spaceLeft(int[] posicion, int[] direccion) {
+        int[] spaceLeft = {0, 0};
+        for (int i = 0; i < 2; i++) {
+            if (direccion[i] != 0) {
+                spaceLeft[i] = N - posicion[i] - 1;
+            }
+            if (direccion[i] < 0) {
+                spaceLeft[i] = posicion[i];
+            }
+            if (direccion[i]==0){
+                spaceLeft[i]=N;
+            }
+        }
+        return Math.min(spaceLeft[0], spaceLeft[1]);
     }
 
     public int recorrer(int[] inicio, int[] direccion) {
@@ -27,14 +55,17 @@ public class MutantDetector {
         int[] coordinate = {inicio[0], inicio[1]};  // Copy of the starting coordinate
 
         // Traverse while the coordinates are within bounds
-        while (coordinate[0] < N && coordinate[1] < N) {
+        while (spaceLeft(coordinate, direccion) + c >= SEQUENCE_LENGTH) {
             char currentChar = dnaMatrix[coordinate[0]][coordinate[1]];
             countstep++;
             // Check if the current character matches the pattern
             if (currentChar == pattern) {
+                geneHighlight[c] = new int[]{coordinate[0], coordinate[1]};  // Save the position
                 c++;  // Increment the match count
             } else {
                 pattern = currentChar;  // Update pattern to the current character
+                geneHighlight = new int[SEQUENCE_LENGTH][2]; // Reset highlight coordinates
+                geneHighlight[0] = new int[]{coordinate[0], coordinate[1]};  // Save the new start
                 c = 1;  // Reset the match count
             }
 
@@ -42,6 +73,9 @@ public class MutantDetector {
             if (c == SEQUENCE_LENGTH) {
                 found++;  // Increment found sequences
                 c = 0;    // Reset count for new sequences
+
+                // Highlight the sequence
+                mp.highlight(geneHighlight);
             }
 
             // Update the coordinates based on the direction
@@ -49,7 +83,7 @@ public class MutantDetector {
             coordinate[1] += direccion[1];
         }
 
-        return found;  // Return the number of sequences found
+        return found;  // Devolver el numero de secuencias encontradas
     }
 
     public boolean isMutant() {
@@ -64,25 +98,26 @@ public class MutantDetector {
                 if (i == 0) {
                     int[] direccion = {1, 0};
                     countSequences += recorrer(inicio, direccion);
-                    if (countSequences > 1) {
-                        System.out.println("countstep=" + countstep);
-                        return true;  // Más de una secuencia encontrada
-                    }
                 }
                 if (j == 0) {
-
-                    if (dnaMatrix.length - SEQUENCE_LENGTH <= i + j) {
-
-                        if (dnaMatrix.length - SEQUENCE_LENGTH <= i - j + dnaMatrix.length - 1) {
-
-                        }
-                    }
+                    int[] direccion = {0, 1};
+                    countSequences += recorrer(inicio, direccion);
                 }
-                System.out.println("countstep=" + countstep);
-                return false;  // No se encontraron suficientes secuencias
+                if (N - SEQUENCE_LENGTH >= i + j) {
+                    int[] direccion = {1, 1};
+                    countSequences += recorrer(inicio, direccion);
+                }
+                if (N - SEQUENCE_LENGTH >= i - j + N- 1) {
+                    int[] direccion = {1, -1};
+                    countSequences += recorrer(inicio, direccion);
+                }
+                if (countSequences >= 2) {
+                    System.out.println("countstep=" + countstep);
+                    return true;  // Más de una secuencia encontrada
+                }
             }
-
         }
+        System.out.println("countstep=" + countstep);
         return false;
     }
 }
