@@ -5,11 +5,15 @@ package org.example;
 public class Main {
     public static void main(String[] args) {
         String[] dna = {
-                "AAAAG",
-                "TTTGA",
-                "TTGTG",
-                "TTAAG",
-                "TTCCT",
+                "AAAAGTCGA",
+                "TTTGTGCTT",
+                "GTTTGAGTG",
+                "TTTCTGATG",
+                "TGCCGATTC",
+                "TCAGGGAGA",
+                "ATTCGAGCC",
+                "CTAGTGTCC",
+                "CTTATGGTC"
         };
 
         MutantDetector detector = new MutantDetector(dna);

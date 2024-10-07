@@ -1,7 +1,5 @@
 package org.example;
 
-import static java.lang.Boolean.*;
-
 public class MutantDetector {
     private static final int SEQUENCE_LENGTH = 4;
     private String[] dna;
@@ -55,7 +53,7 @@ public class MutantDetector {
         int[] coordinate = {inicio[0], inicio[1]};  // Copy of the starting coordinate
 
         // Traverse while the coordinates are within bounds
-        while (spaceLeft(coordinate, direccion) + c >= SEQUENCE_LENGTH) {
+        while (spaceLeft(coordinate, direccion) + c + 1 >= SEQUENCE_LENGTH) {
             char currentChar = dnaMatrix[coordinate[0]][coordinate[1]];
             countstep++;
             // Check if the current character matches the pattern
