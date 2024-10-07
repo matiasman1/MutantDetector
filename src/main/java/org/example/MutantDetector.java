@@ -30,6 +30,20 @@ public class MutantDetector {
         this.geneHighlight = new int[SEQUENCE_LENGTH][2];
     }
 
+    public MutantDetector(char[][] dnaMatrix) {
+        this.dnaMatrix = dnaMatrix;
+        this.N = dnaMatrix.length;
+
+        // Initialize MatrizPrint with the matrix
+        this.mp = new MatrizPrint(dnaMatrix);
+
+        System.out.println("Matriz sin resaltado:");
+        mp.print();
+
+        // Initialize the geneHighlight array (4 coordinates max at a time)
+        this.geneHighlight = new int[SEQUENCE_LENGTH][2];
+    }
+
     public int spaceLeft(int[] posicion, int[] direccion) {
         int[] spaceLeft = {0, 0};
         for (int i = 0; i < 2; i++) {

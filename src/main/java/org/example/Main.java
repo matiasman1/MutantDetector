@@ -16,9 +16,11 @@ public class Main {
                 "CTTATGGTC"
         };
 
-        MutantDetector detector = new MutantDetector(dna);
+        ADN adn = new ADN(16);  // Create a random NxN matrix of 'A', 'C', 'G', 'T'
+
+        // Create the MutantDetector with the generated matrix
+        MutantDetector detector = new MutantDetector(adn.getDnaMatrix());
         boolean isMutant = detector.isMutant();
         System.out.println("Is mutant? " + isMutant);
-
     }
 }
